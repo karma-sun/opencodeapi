@@ -1,0 +1,49 @@
+#!/bin/sh
+if [ -z $API_KEY ]; then
+./wild-work --no-tray
+else
+cat << EOF > /tmp/config.json
+{
+  "listen": "0.0.0.0:${PORT:-8080}",
+  "server_keys": ["${API_KEY}"],
+  "zen_keys": [],
+  "go_keys": [],
+  "anonymous": true,
+  "proxies": ["direct"],
+  "proxyfile": "",
+  "upstream": {
+    "zen": "https://opencode.ai/zen",
+    "go": "https://opencode.ai/zen/go"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "timeout_seconds": 300
+  },
+  "models": {
+    "refresh_seconds": 3600,
+    "protocols": {}
+  },
+  "performance": {
+    "max_idle_conns": 2048,
+    "max_idle_conns_per_host": 256,
+    "max_conns_per_host": 0,
+    "idle_conn_timeout_seconds": 120,
+    "connect_timeout_seconds": 5,
+    "failure_cooldown_seconds": 15,
+    "attempt_timeout_seconds": 0
+  },
+  "logging": {
+    "level": "info"
+  },
+  "webui": {
+    "enabled": false
+  },
+  "reasoning": {
+    "effort": "high",
+    "effort_by_model": {}
+  }
+}
+EOF
+
+./opencode2api -config /tmp/config.json
+fi
